@@ -1,0 +1,1812 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0A0E27">
+    <title>Danika Fit</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        :root {
+            --bg-primary: #0A0E27;
+            --bg-secondary: #13192F;
+            --bg-tertiary: #1A2038;
+            --accent: #6C63FF;
+            --accent-hover: #5850E5;
+            --text-primary: #FFFFFF;
+            --text-secondary: #8F9BB3;
+            --text-muted: #5B6B8C;
+            --success: #00E096;
+            --danger: #FF3D71;
+            --warning: #FFAA00;
+            --border: #222B45;
+            --shadow: rgba(0, 0, 0, 0.3);
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+        }
+        
+        .app { min-height: 100vh; display: flex; flex-direction: column; }
+        
+        /* Header */
+        .header {
+            background: var(--bg-secondary);
+            padding: 24px;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+            background: rgba(19, 25, 47, 0.95);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .logo-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--accent) 0%, #8B7FFF 100%);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 4px 12px rgba(108, 99, 255, 0.3);
+        }
+        
+        .logo-text {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--accent) 0%, #8B7FFF 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .icon-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+        
+        .icon-btn:hover { background: var(--border); transform: translateY(-2px); }
+        .icon-btn:active { transform: scale(0.95); }
+        
+        .notification-dot {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 8px;
+            height: 8px;
+            background: var(--danger);
+            border-radius: 50%;
+            border: 2px solid var(--bg-secondary);
+        }
+        
+        /* Navigation */
+        .nav {
+            background: var(--bg-secondary);
+            padding: 12px 24px;
+            border-bottom: 1px solid var(--border);
+            overflow-x: auto;
+            display: flex;
+            gap: 8px;
+            position: sticky;
+            top: 93px;
+            z-index: 99;
+            backdrop-filter: blur(20px);
+            background: rgba(19, 25, 47, 0.95);
+        }
+        
+        .nav::-webkit-scrollbar { display: none; }
+        
+        .nav-item {
+            padding: 10px 20px;
+            border-radius: 12px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .nav-item:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+        .nav-item.active {
+            background: var(--accent);
+            color: white;
+            box-shadow: 0 4px 12px rgba(108, 99, 255, 0.3);
+        }
+        
+        /* Content */
+        .content {
+            flex: 1;
+            padding: 24px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        /* Calendar */
+        .calendar {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 24px;
+            border: 1px solid var(--border);
+        }
+        
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        
+        .calendar-month {
+            font-size: 22px;
+            font-weight: 700;
+        }
+        
+        .calendar-nav {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .calendar-nav-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .calendar-nav-btn:hover { background: var(--border); }
+        .calendar-nav-btn:active { transform: scale(0.95); }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        
+        .calendar-weekday {
+            text-align: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-muted);
+            padding: 8px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 15px;
+            font-weight: 600;
+            background: var(--bg-tertiary);
+            border: 2px solid transparent;
+            position: relative;
+        }
+        
+        .calendar-day:hover { background: var(--border); transform: scale(1.05); }
+        .calendar-day.other-month { opacity: 0.3; }
+        .calendar-day.today {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px rgba(108, 99, 255, 0.1);
+        }
+        .calendar-day.has-workout {
+            background: linear-gradient(135deg, var(--accent) 0%, #8B7FFF 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(108, 99, 255, 0.3);
+        }
+        .calendar-day:active { transform: scale(0.95); }
+        
+        /* Cards */
+        .card {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .card-title {
+            font-size: 20px;
+            font-weight: 700;
+        }
+        
+        /* Status Card */
+        .status-card {
+            text-align: center;
+            padding: 48px 24px;
+        }
+        
+        .status-icon {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 24px;
+            background: linear-gradient(135deg, var(--accent) 0%, #8B7FFF 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            box-shadow: 0 8px 24px rgba(108, 99, 255, 0.3);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .status-icon.rest {
+            background: var(--bg-tertiary);
+            box-shadow: none;
+        }
+        
+        .status-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .status-subtitle {
+            color: var(--text-secondary);
+            font-size: 15px;
+        }
+        
+        /* Buttons */
+        .btn {
+            width: 100%;
+            padding: 16px 24px;
+            border-radius: 14px;
+            border: none;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 12px;
+        }
+        
+        .btn:active { transform: scale(0.98); }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent) 0%, #8B7FFF 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(108, 99, 255, 0.3);
+        }
+        
+        .btn-primary:hover {
+            box-shadow: 0 6px 16px rgba(108, 99, 255, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+        
+        .btn-secondary:hover { background: var(--border); }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            color: var(--accent);
+            border: 2px solid var(--accent);
+        }
+        
+        .btn-outline:hover {
+            background: var(--accent);
+            color: white;
+        }
+        
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+            animation: fadeIn 0.2s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .modal {
+            background: var(--bg-secondary);
+            border-radius: 24px;
+            padding: 32px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease-out;
+            border: 1px solid var(--border);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        
+        .modal-title {
+            font-size: 24px;
+            font-weight: 800;
+        }
+        
+        .close-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--bg-tertiary);
+            border: none;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .close-btn:hover {
+            background: var(--border);
+            color: var(--text-primary);
+        }
+        
+        /* Input */
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        .input-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+        
+        .input {
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+        
+        .input:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: var(--bg-primary);
+            box-shadow: 0 0 0 4px rgba(108, 99, 255, 0.1);
+        }
+        
+        /* Exercise Item */
+        .exercise-item {
+            background: var(--bg-tertiary);
+            padding: 16px;
+            border-radius: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .exercise-item:hover {
+            border-color: var(--accent);
+            transform: translateX(4px);
+        }
+        
+        .exercise-icon {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, var(--accent) 0%, #8B7FFF 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(108, 99, 255, 0.3);
+        }
+        
+        .exercise-info { flex: 1; }
+        
+        .exercise-name {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .exercise-meta {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        
+        /* Set Item */
+        .set-item {
+            background: var(--bg-tertiary);
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--border);
+        }
+        
+        .set-number {
+            font-weight: 700;
+            color: var(--accent);
+            font-size: 16px;
+        }
+        
+        .set-details {
+            display: flex;
+            gap: 16px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .set-input-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .stat-card {
+            background: var(--bg-tertiary);
+            padding: 24px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+        
+        .stat-icon {
+            width: 56px;
+            height: 56px;
+            margin: 0 auto 16px;
+            background: linear-gradient(135deg, var(--accent) 0%, #8B7FFF 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(108, 99, 255, 0.3);
+        }
+        
+        .stat-value {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+        
+        /* Timer */
+        .timer-display {
+            text-align: center;
+            padding: 60px 24px;
+            background: linear-gradient(135deg, var(--accent) 0%, #8B7FFF 100%);
+            border-radius: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 24px rgba(108, 99, 255, 0.3);
+        }
+        
+        .timer-time {
+            font-size: 80px;
+            font-weight: 900;
+            margin-bottom: 32px;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: -4px;
+        }
+        
+        .timer-controls {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+        
+        .timer-btn {
+            padding: 16px 32px;
+            border: 3px solid white;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 16px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 16px;
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        
+        .timer-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .timer-btn:active { transform: scale(0.95); }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 80px 24px;
+        }
+        
+        .empty-icon {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 24px;
+            background: var(--bg-tertiary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: var(--text-muted);
+            border: 2px solid var(--border);
+        }
+        
+        .empty-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .empty-subtitle {
+            color: var(--text-secondary);
+            font-size: 16px;
+            margin-bottom: 32px;
+        }
+        
+        /* Schedule Item */
+        .schedule-item {
+            background: var(--bg-tertiary);
+            padding: 16px;
+            border-radius: 16px;
+            margin-bottom: 12px;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .schedule-date {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 12px;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            min-width: 70px;
+        }
+        
+        .schedule-day {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--accent);
+        }
+        
+        .schedule-month {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+        
+        .schedule-info { flex: 1; }
+        
+        .schedule-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .schedule-time {
+            font-size: 14px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .schedule-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn-sm {
+            padding: 10px 16px;
+            font-size: 14px;
+            width: auto;
+            margin: 0;
+        }
+        
+        /* Badge */
+        .badge {
+            display: inline-block;
+            padding: 6px 12px;
+            background: var(--accent);
+            color: white;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-right: 8px;
+        }
+        
+        /* Video Container */
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* Search Box */
+        .search-box {
+            position: relative;
+            margin-bottom: 16px;
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+        
+        .search-box input {
+            padding-left: 48px;
+        }
+        
+        select {
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            font-size: 16px;
+            margin-bottom: 16px;
+        }
+        
+        @media (max-width: 768px) {
+            .stats-grid { grid-template-columns: 1fr; }
+            .timer-time { font-size: 64px; }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        const exerciseDatabase = [
+            { id: 1, name: 'Жим штанги лежа', category: 'Грудь', muscle: 'Грудные', videoId: 'rT7DgCr-3pg' },
+            { id: 2, name: 'Приседания со штангой', category: 'Ноги', muscle: 'Квадрицепсы', videoId: 'ultWZbUMPL8' },
+            { id: 3, name: 'Становая тяга', category: 'Спина', muscle: 'Спина, ноги', videoId: 'op9kVnSso6Q' },
+            { id: 4, name: 'Подтягивания', category: 'Спина', muscle: 'Широчайшие', videoId: 'eGo4IYlbE5g' },
+            { id: 5, name: 'Жим штанги стоя', category: 'Плечи', muscle: 'Дельты', videoId: 'QAQ64hK4Xxs' },
+            { id: 6, name: 'Отжимания', category: 'Грудь', muscle: 'Грудные, трицепс', videoId: 'IODxDxX7oi4' },
+            { id: 7, name: 'Подъем штанги на бицепс', category: 'Руки', muscle: 'Бицепс', videoId: 'ykJmrZ5v0Oo' },
+            { id: 8, name: 'Французский жим', category: 'Руки', muscle: 'Трицепс', videoId: 'nRiJVZDpdL0' },
+            { id: 9, name: 'Планка', category: 'Пресс', muscle: 'Кор', videoId: 'ASdvN_XEl_c' },
+            { id: 10, name: 'Выпады', category: 'Ноги', muscle: 'Квадрицепсы, ягодицы', videoId: 'QOVaHwm-Q6U' },
+        ];
+
+        // Utility functions
+        const getDateKey = (date) => {
+            const d = new Date(date);
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        };
+
+        const isSameDay = (date1, date2) => {
+            return getDateKey(date1) === getDateKey(date2);
+        };
+
+        const getDaysInMonth = (date) => {
+            const year = date.getFullYear();
+            const month = date.getMonth();
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const daysInMonth = lastDay.getDate();
+            const startingDayOfWeek = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
+            
+            const days = [];
+            const prevMonth = new Date(year, month, 0);
+            const prevMonthDays = prevMonth.getDate();
+            
+            for (let i = startingDayOfWeek - 1; i >= 0; i--) {
+                days.push({
+                    day: prevMonthDays - i,
+                    isCurrentMonth: false,
+                    date: new Date(year, month - 1, prevMonthDays - i)
+                });
+            }
+            
+            for (let day = 1; day <= daysInMonth; day++) {
+                days.push({
+                    day,
+                    isCurrentMonth: true,
+                    date: new Date(year, month, day)
+                });
+            }
+            
+            const remainingDays = 42 - days.length;
+            for (let day = 1; day <= remainingDays; day++) {
+                days.push({
+                    day,
+                    isCurrentMonth: false,
+                    date: new Date(year, month + 1, day)
+                });
+            }
+            
+            return days;
+        };
+
+        function App() {
+            const [activeTab, setActiveTab] = useState('home');
+            const [currentDate, setCurrentDate] = useState(new Date());
+            const [schedule, setSchedule] = useState({});
+            const [workouts, setWorkouts] = useState([]);
+            const [currentWorkout, setCurrentWorkout] = useState(null);
+            const [showScheduleModal, setShowScheduleModal] = useState(false);
+            const [selectedDate, setSelectedDate] = useState(null);
+            const [showExerciseModal, setShowExerciseModal] = useState(false);
+            const [showVideoModal, setShowVideoModal] = useState(false);
+            const [selectedExercise, setSelectedExercise] = useState(null);
+            const [searchTerm, setSearchTerm] = useState('');
+            const [filterCategory, setFilterCategory] = useState('all');
+            const [timerSeconds, setTimerSeconds] = useState(60);
+            const [timerActive, setTimerActive] = useState(false);
+            const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+
+            // Load data
+            useEffect(() => {
+                const savedSchedule = localStorage.getItem('fittrack_schedule');
+                const savedWorkouts = localStorage.getItem('fittrack_workouts');
+                if (savedSchedule) {
+                    try {
+                        setSchedule(JSON.parse(savedSchedule));
+                    } catch (e) {
+                        console.error('Error loading schedule:', e);
+                    }
+                }
+                if (savedWorkouts) {
+                    try {
+                        setWorkouts(JSON.parse(savedWorkouts));
+                    } catch (e) {
+                        console.error('Error loading workouts:', e);
+                    }
+                }
+            }, []);
+
+            // Save data
+            useEffect(() => {
+                localStorage.setItem('fittrack_schedule', JSON.stringify(schedule));
+            }, [schedule]);
+
+            useEffect(() => {
+                localStorage.setItem('fittrack_workouts', JSON.stringify(workouts));
+            }, [workouts]);
+
+            // Timer
+            useEffect(() => {
+                if (timerActive && timerSeconds > 0) {
+                    const interval = setInterval(() => {
+                        setTimerSeconds(prev => prev - 1);
+                    }, 1000);
+                    return () => clearInterval(interval);
+                } else if (timerSeconds === 0 && timerActive) {
+                    setTimerActive(false);
+                    if ('vibrate' in navigator) navigator.vibrate([200, 100, 200]);
+                    if (Notification.permission === 'granted') {
+                        new Notification('Отдых закончен!', { body: 'Время следующего подхода' });
+                    }
+                }
+            }, [timerActive, timerSeconds]);
+
+            const requestNotificationPermission = async () => {
+                if ('Notification' in window) {
+                    const permission = await Notification.requestPermission();
+                    setNotificationsEnabled(permission === 'granted');
+                }
+            };
+
+            const getTodayWorkout = () => {
+                const todayKey = getDateKey(new Date());
+                return schedule[todayKey];
+            };
+
+            const hasWorkout = (date) => {
+                const key = getDateKey(date);
+                return schedule[key] !== undefined;
+            };
+
+            const addSchedule = (date, time) => {
+                const key = getDateKey(date);
+                setSchedule({ ...schedule, [key]: { time, date: key } });
+                setShowScheduleModal(false);
+            };
+
+            const deleteSchedule = (date) => {
+                const key = getDateKey(date);
+                const newSchedule = { ...schedule };
+                delete newSchedule[key];
+                setSchedule(newSchedule);
+            };
+
+            const startWorkout = () => {
+                setCurrentWorkout({
+                    id: Date.now(),
+                    date: new Date().toISOString(),
+                    exercises: [],
+                    completed: false
+                });
+                setActiveTab('workout');
+            };
+
+            const completeWorkout = () => {
+                if (!currentWorkout || currentWorkout.exercises.length === 0) {
+                    alert('Добавь хотя бы одно упражнение!');
+                    return;
+                }
+                setWorkouts([{ ...currentWorkout, completed: true }, ...workouts]);
+                setCurrentWorkout(null);
+                setActiveTab('history');
+                if ('vibrate' in navigator) navigator.vibrate([100, 50, 100, 50, 100]);
+            };
+
+            const addExerciseToWorkout = (exercise) => {
+                if (!currentWorkout) return;
+                setCurrentWorkout({
+                    ...currentWorkout,
+                    exercises: [...currentWorkout.exercises, { ...exercise, sets: [] }]
+                });
+                setShowExerciseModal(false);
+                setSearchTerm('');
+                setFilterCategory('all');
+            };
+
+            const addSet = (exerciseId, weight, reps) => {
+                if (!currentWorkout) return;
+                setCurrentWorkout({
+                    ...currentWorkout,
+                    exercises: currentWorkout.exercises.map(ex =>
+                        ex.id === exerciseId
+                            ? { ...ex, sets: [...ex.sets, { weight: parseFloat(weight), reps: parseInt(reps) }] }
+                            : ex
+                    )
+                });
+                if ('vibrate' in navigator) navigator.vibrate(50);
+            };
+
+            const showExerciseVideo = (exercise) => {
+                setSelectedExercise(exercise);
+                setShowVideoModal(true);
+            };
+
+            const filteredExercises = exerciseDatabase.filter(ex => {
+                const matchesSearch = ex.name.toLowerCase().includes(searchTerm.toLowerCase());
+                const matchesCategory = filterCategory === 'all' || ex.category === filterCategory;
+                return matchesSearch && matchesCategory;
+            });
+
+            const stats = {
+                totalWorkouts: workouts.length,
+                totalExercises: workouts.reduce((acc, w) => acc + w.exercises.length, 0),
+                totalSets: workouts.reduce((acc, w) =>
+                    acc + w.exercises.reduce((exAcc, ex) => exAcc + ex.sets.length, 0), 0),
+                totalVolume: workouts.reduce((acc, w) =>
+                    acc + w.exercises.reduce((exAcc, ex) =>
+                        exAcc + ex.sets.reduce((setAcc, set) =>
+                            setAcc + (set.weight * set.reps), 0), 0), 0)
+            };
+
+            const categories = ['all', ...new Set(exerciseDatabase.map(ex => ex.category))];
+            const todayWorkout = getTodayWorkout();
+            const calendarDays = getDaysInMonth(currentDate);
+
+            // Get upcoming workouts (excluding today)
+            const upcomingWorkouts = Object.entries(schedule)
+                .filter(([key]) => {
+                    const scheduleDate = new Date(key + 'T00:00:00');
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    return scheduleDate > today;
+                })
+                .sort((a, b) => new Date(a[0]) - new Date(b[0]))
+                .slice(0, 5);
+
+            return (
+                <div className="app">
+                    <div className="header">
+                        <div className="header-content">
+                            <div className="logo">
+                                <div className="logo-icon">
+                                    <i className="fas fa-dumbbell"></i>
+                                </div>
+                                <div className="logo-text">Danika Fit</div>
+                            </div>
+                            <button className="icon-btn" onClick={requestNotificationPermission}>
+                                <i className="fas fa-bell"></i>
+                                {!notificationsEnabled && <div className="notification-dot"></div>}
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="nav">
+                        <button className={`nav-item ${activeTab === 'home' ? 'active' : ''}`} onClick={() => setActiveTab('home')}>
+                            <i className="fas fa-home"></i> Главная
+                        </button>
+                        <button className={`nav-item ${activeTab === 'workout' ? 'active' : ''}`} onClick={() => setActiveTab('workout')}>
+                            <i className="fas fa-dumbbell"></i> Тренировка
+                        </button>
+                        <button className={`nav-item ${activeTab === 'exercises' ? 'active' : ''}`} onClick={() => setActiveTab('exercises')}>
+                            <i className="fas fa-list"></i> Упражнения
+                        </button>
+                        <button className={`nav-item ${activeTab === 'history' ? 'active' : ''}`} onClick={() => setActiveTab('history')}>
+                            <i className="fas fa-history"></i> История
+                        </button>
+                        <button className={`nav-item ${activeTab === 'stats' ? 'active' : ''}`} onClick={() => setActiveTab('stats')}>
+                            <i className="fas fa-chart-bar"></i> Статистика
+                        </button>
+                        <button className={`nav-item ${activeTab === 'timer' ? 'active' : ''}`} onClick={() => setActiveTab('timer')}>
+                            <i className="fas fa-stopwatch"></i> Таймер
+                        </button>
+                    </div>
+
+                    <div className="content">
+                        {activeTab === 'home' && (
+                            <>
+                                <div className="calendar">
+                                    <div className="calendar-header">
+                                        <div className="calendar-month">
+                                            {currentDate.toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' })}
+                                        </div>
+                                        <div className="calendar-nav">
+                                            <button className="calendar-nav-btn" onClick={() => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1))}>
+                                                <i className="fas fa-chevron-left"></i>
+                                            </button>
+                                            <button className="calendar-nav-btn" onClick={() => setCurrentDate(new Date())}>
+                                                <i className="fas fa-calendar-day"></i>
+                                            </button>
+                                            <button className="calendar-nav-btn" onClick={() => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1))}>
+                                                <i className="fas fa-chevron-right"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div className="calendar-grid">
+                                        {['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'].map(day => (
+                                            <div key={day} className="calendar-weekday">{day}</div>
+                                        ))}
+                                    </div>
+
+                                    <div className="calendar-grid">
+                                        {calendarDays.map((dayObj, idx) => (
+                                            <div
+                                                key={idx}
+                                                className={`calendar-day
+                                                    ${!dayObj.isCurrentMonth ? 'other-month' : ''}
+                                                    ${isSameDay(dayObj.date, new Date()) ? 'today' : ''}
+                                                    ${hasWorkout(dayObj.date) ? 'has-workout' : ''}
+                                                `}
+                                                onClick={() => {
+                                                    setSelectedDate(dayObj.date);
+                                                    setShowScheduleModal(true);
+                                                }}
+                                            >
+                                                {dayObj.day}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="card">
+                                    <div className="status-card">
+                                        {todayWorkout ? (
+                                            <>
+                                                <div className="status-icon">
+                                                    <i className="fas fa-fire"></i>
+                                                </div>
+                                                <div className="status-title">Запланирована тренировка</div>
+                                                <div className="status-subtitle">Время: {todayWorkout.time}</div>
+                                                <button className="btn btn-primary" onClick={startWorkout}>
+                                                    <i className="fas fa-play"></i> Начать тренировку
+                                                </button>
+                                                <button className="btn btn-danger" onClick={() => deleteSchedule(new Date())}>
+                                                    <i className="fas fa-trash"></i> Отменить
+                                                </button>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <div className="status-icon rest">
+                                                    <i className="fas fa-couch"></i>
+                                                </div>
+                                                <div className="status-title">Сегодня выходной</div>
+                                                <div className="status-subtitle">Тренировка не запланирована</div>
+                                                <button className="btn btn-outline" onClick={() => {
+                                                    setSelectedDate(new Date());
+                                                    setShowScheduleModal(true);
+                                                }}>
+                                                    <i className="fas fa-plus"></i> Запланировать тренировку
+                                                </button>
+                                            </>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {upcomingWorkouts.length > 0 && (
+                                    <div className="card">
+                                        <div className="card-header">
+                                            <div className="card-title">Ближайшие тренировки</div>
+                                        </div>
+                                        {upcomingWorkouts.map(([dateStr, workout]) => {
+                                            const date = new Date(dateStr + 'T00:00:00');
+                                            return (
+                                                <div key={dateStr} className="schedule-item">
+                                                    <div className="schedule-date">
+                                                        <div className="schedule-day">{date.getDate()}</div>
+                                                        <div className="schedule-month">
+                                                            {date.toLocaleDateString('ru-RU', { month: 'short' })}
+                                                        </div>
+                                                    </div>
+                                                    <div className="schedule-info">
+                                                        <div className="schedule-title">Тренировка</div>
+                                                        <div className="schedule-time">
+                                                            <i className="fas fa-clock"></i>
+                                                            {workout.time}
+                                                        </div>
+                                                    </div>
+                                                    <div className="schedule-actions">
+                                                        <button
+                                                            className="btn btn-danger btn-sm"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                deleteSchedule(date);
+                                                            }}
+                                                        >
+                                                            <i className="fas fa-trash"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                )}
+                            </>
+                        )}
+
+                        {activeTab === 'workout' && (
+                            <>
+                                {!currentWorkout ? (
+                                    <div className="empty-state">
+                                        <div className="empty-icon">
+                                            <i className="fas fa-dumbbell"></i>
+                                        </div>
+                                        <div className="empty-title">Нет активной тренировки</div>
+                                        <div className="empty-subtitle">Начни новую тренировку прямо сейчас</div>
+                                        <button className="btn btn-primary" onClick={startWorkout}>
+                                            <i className="fas fa-play"></i> Начать тренировку
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <div className="card">
+                                            <div className="card-header">
+                                                <div className="card-title">Текущая тренировка</div>
+                                                <div style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>
+                                                    {new Date(currentWorkout.date).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}
+                                                </div>
+                                            </div>
+                                            <button className="btn btn-primary" onClick={() => setShowExerciseModal(true)}>
+                                                <i className="fas fa-plus"></i> Добавить упражнение
+                                            </button>
+                                        </div>
+
+                                        {currentWorkout.exercises.map((exercise, exIndex) => (
+                                            <div key={exIndex} className="card">
+                                                <div className="card-header">
+                                                    <div className="card-title">{exercise.name}</div>
+                                                    <button
+                                                        className="btn btn-secondary btn-sm"
+                                                        onClick={() => showExerciseVideo(exercise)}
+                                                    >
+                                                        <i className="fas fa-video"></i>
+                                                    </button>
+                                                </div>
+                                                <div style={{ color: 'var(--text-secondary)', fontSize: '14px', marginBottom: '16px' }}>
+                                                    {exercise.muscle}
+                                                </div>
+
+                                                {exercise.sets.map((set, setIndex) => (
+                                                    <div key={setIndex} className="set-item">
+                                                        <div className="set-number">Подход {setIndex + 1}</div>
+                                                        <div className="set-details">
+                                                            <div>{set.weight} кг</div>
+                                                            <div>× {set.reps}</div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+
+                                                <SetInput exerciseId={exercise.id} onAddSet={addSet} />
+                                            </div>
+                                        ))}
+
+                                        {currentWorkout.exercises.length > 0 && (
+                                            <div className="card">
+                                                <button className="btn btn-primary" onClick={completeWorkout}>
+                                                    <i className="fas fa-check"></i> Завершить тренировку
+                                                </button>
+                                                <button
+                                                    className="btn btn-danger"
+                                                    onClick={() => {
+                                                        if (confirm('Отменить тренировку?')) setCurrentWorkout(null);
+                                                    }}
+                                                >
+                                                    <i className="fas fa-times"></i> Отменить
+                                                </button>
+                                            </div>
+                                        )}
+                                    </>
+                                )}
+                            </>
+                        )}
+
+                        {activeTab === 'exercises' && (
+                            <>
+                                <div className="card">
+                                    <div className="card-title">Библиотека упражнений</div>
+                                    <div className="search-box">
+                                        <i className="fas fa-search"></i>
+                                        <input
+                                            className="input"
+                                            placeholder="Поиск упражнений..."
+                                            value={searchTerm}
+                                            onChange={(e) => setSearchTerm(e.target.value)}
+                                        />
+                                    </div>
+                                    <select value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)}>
+                                        {categories.map(cat => (
+                                            <option key={cat} value={cat}>
+                                                {cat === 'all' ? 'Все категории' : cat}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                {filteredExercises.map(exercise => (
+                                    <div
+                                        key={exercise.id}
+                                        className="exercise-item"
+                                        onClick={() => showExerciseVideo(exercise)}
+                                    >
+                                        <div className="exercise-icon">
+                                            <i className="fas fa-dumbbell"></i>
+                                        </div>
+                                        <div className="exercise-info">
+                                            <div className="exercise-name">{exercise.name}</div>
+                                            <div className="exercise-meta">
+                                                <span className="badge">{exercise.category}</span>
+                                                {exercise.muscle}
+                                            </div>
+                                        </div>
+                                        <i className="fas fa-chevron-right" style={{ color: 'var(--text-muted)' }}></i>
+                                    </div>
+                                ))}
+                            </>
+                        )}
+
+                        {activeTab === 'history' && (
+                            <>
+                                <div className="card">
+                                    <div className="card-title">История тренировок</div>
+                                    <div style={{ color: 'var(--text-secondary)' }}>Всего: {workouts.length}</div>
+                                </div>
+
+                                {workouts.length === 0 ? (
+                                    <div className="empty-state">
+                                        <div className="empty-icon">
+                                            <i className="fas fa-history"></i>
+                                        </div>
+                                        <div className="empty-title">Нет тренировок</div>
+                                        <div className="empty-subtitle">Начни тренироваться, чтобы увидеть историю</div>
+                                    </div>
+                                ) : (
+                                    workouts.map(workout => (
+                                        <div key={workout.id} className="card">
+                                            <div className="card-header">
+                                                <div className="card-title">
+                                                    {new Date(workout.date).toLocaleDateString('ru-RU', {
+                                                        weekday: 'short',
+                                                        day: 'numeric',
+                                                        month: 'short'
+                                                    })}
+                                                </div>
+                                                <div style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>
+                                                    {new Date(workout.date).toLocaleTimeString('ru-RU', {
+                                                        hour: '2-digit',
+                                                        minute: '2-digit'
+                                                    })}
+                                                </div>
+                                            </div>
+
+                                            <div style={{ marginBottom: '16px', color: 'var(--text-secondary)' }}>
+                                                <i className="fas fa-dumbbell"></i> {workout.exercises.length} упражнений •{' '}
+                                                {workout.exercises.reduce((acc, ex) => acc + ex.sets.length, 0)} подходов
+                                            </div>
+
+                                            {workout.exercises.map((ex, i) => (
+                                                <div
+                                                    key={i}
+                                                    style={{
+                                                        marginBottom: '12px',
+                                                        paddingBottom: '12px',
+                                                        borderBottom:
+                                                            i < workout.exercises.length - 1 ? '1px solid var(--border)' : 'none'
+                                                    }}
+                                                >
+                                                    <div style={{ fontWeight: '700', marginBottom: '8px' }}>{ex.name}</div>
+                                                    {ex.sets.map((set, j) => (
+                                                        <div
+                                                            key={j}
+                                                            style={{
+                                                                fontSize: '14px',
+                                                                color: 'var(--text-secondary)',
+                                                                marginLeft: '12px'
+                                                            }}
+                                                        >
+                                                            Подход {j + 1}: {set.weight}кг × {set.reps}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            ))}
+
+                                            <button
+                                                className="btn btn-danger"
+                                                onClick={() => setWorkouts(workouts.filter(w => w.id !== workout.id))}
+                                            >
+                                                <i className="fas fa-trash"></i> Удалить
+                                            </button>
+                                        </div>
+                                    ))
+                                )}
+                            </>
+                        )}
+
+                        {activeTab === 'stats' && (
+                            <>
+                                <div className="stats-grid">
+                                    <div className="stat-card">
+                                        <div className="stat-icon">
+                                            <i className="fas fa-dumbbell"></i>
+                                        </div>
+                                        <div className="stat-value">{stats.totalWorkouts}</div>
+                                        <div className="stat-label">Тренировок</div>
+                                    </div>
+                                    <div className="stat-card">
+                                        <div className="stat-icon">
+                                            <i className="fas fa-list"></i>
+                                        </div>
+                                        <div className="stat-value">{stats.totalExercises}</div>
+                                        <div className="stat-label">Упражнений</div>
+                                    </div>
+                                    <div className="stat-card">
+                                        <div className="stat-icon">
+                                            <i className="fas fa-layer-group"></i>
+                                        </div>
+                                        <div className="stat-value">{stats.totalSets}</div>
+                                        <div className="stat-label">Подходов</div>
+                                    </div>
+                                    <div className="stat-card">
+                                        <div className="stat-icon">
+                                            <i className="fas fa-weight-hanging"></i>
+                                        </div>
+                                        <div className="stat-value">{Math.round(stats.totalVolume)}</div>
+                                        <div className="stat-label">Тоннаж (кг)</div>
+                                    </div>
+                                </div>
+
+                                <div className="card">
+                                    <div className="card-title">Прогресс по категориям</div>
+                                    {workouts.length > 0 ? (
+                                        <div style={{ marginTop: '20px' }}>
+                                            {categories
+                                                .filter(c => c !== 'all')
+                                                .map(category => {
+                                                    const categoryVolume = workouts
+                                                        .flatMap(w => w.exercises.filter(e => e.category === category))
+                                                        .reduce(
+                                                            (acc, ex) =>
+                                                                acc +
+                                                                ex.sets.reduce((s, set) => s + set.weight * set.reps, 0),
+                                                            0
+                                                        );
+                                                    if (categoryVolume === 0) return null;
+
+                                                    return (
+                                                        <div key={category} style={{ marginBottom: '20px' }}>
+                                                            <div
+                                                                style={{
+                                                                    display: 'flex',
+                                                                    justifyContent: 'space-between',
+                                                                    marginBottom: '8px'
+                                                                }}
+                                                            >
+                                                                <div style={{ fontWeight: '700' }}>{category}</div>
+                                                                <div style={{ color: 'var(--text-secondary)' }}>
+                                                                    {Math.round(categoryVolume)} кг
+                                                                </div>
+                                                            </div>
+                                                            <div
+                                                                style={{
+                                                                    background: 'var(--bg-tertiary)',
+                                                                    height: '12px',
+                                                                    borderRadius: '6px',
+                                                                    overflow: 'hidden'
+                                                                }}
+                                                            >
+                                                                <div
+                                                                    style={{
+                                                                        background:
+                                                                            'linear-gradient(135deg, var(--accent) 0%, #8B7FFF 100%)',
+                                                                        height: '100%',
+                                                                        width: `${(categoryVolume / stats.totalVolume) * 100}%`,
+                                                                        transition: 'width 0.3s'
+                                                                    }}
+                                                                ></div>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })}
+                                        </div>
+                                    ) : (
+                                        <div style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '40px 20px' }}>
+                                            Начни тренироваться, чтобы увидеть статистику
+                                        </div>
+                                    )}
+                                </div>
+                            </>
+                        )}
+
+                        {activeTab === 'timer' && (
+                            <>
+                                <div className="timer-display">
+                                    <div className="timer-time">
+                                        {Math.floor(timerSeconds / 60)}:{(timerSeconds % 60).toString().padStart(2, '0')}
+                                    </div>
+                                    <div className="timer-controls">
+                                        {!timerActive ? (
+                                            <button className="timer-btn" onClick={() => setTimerActive(true)}>
+                                                <i className="fas fa-play"></i> Старт
+                                            </button>
+                                        ) : (
+                                            <button className="timer-btn" onClick={() => setTimerActive(false)}>
+                                                <i className="fas fa-pause"></i> Пауза
+                                            </button>
+                                        )}
+                                        <button
+                                            className="timer-btn"
+                                            onClick={() => {
+                                                setTimerActive(false);
+                                                setTimerSeconds(60);
+                                            }}
+                                        >
+                                            <i className="fas fa-redo"></i> Сброс
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div className="card">
+                                    <div className="card-title">Предустановки</div>
+                                    {[30, 60, 90, 120, 180].map(seconds => (
+                                        <button
+                                            key={seconds}
+                                            className="btn btn-secondary"
+                                            onClick={() => {
+                                                setTimerSeconds(seconds);
+                                                setTimerActive(false);
+                                            }}
+                                        >
+                                            {seconds >= 60 ? `${seconds / 60} мин` : `${seconds} сек`}
+                                        </button>
+                                    ))}
+                                </div>
+                            </>
+                        )}
+                    </div>
+
+                    {showScheduleModal && selectedDate && (
+                        <ScheduleModal
+                            selectedDate={selectedDate}
+                            schedule={schedule}
+                            onClose={() => setShowScheduleModal(false)}
+                            onSave={addSchedule}
+                            onDelete={deleteSchedule}
+                        />
+                    )}
+
+                    {showExerciseModal && (
+                        <ExerciseModal
+                            exercises={filteredExercises}
+                            searchTerm={searchTerm}
+                            setSearchTerm={setSearchTerm}
+                            filterCategory={filterCategory}
+                            setFilterCategory={setFilterCategory}
+                            categories={categories}
+                            onSelect={addExerciseToWorkout}
+                            onClose={() => setShowExerciseModal(false)}
+                        />
+                    )}
+
+                    {showVideoModal && selectedExercise && (
+                        <VideoModal exercise={selectedExercise} onClose={() => setShowVideoModal(false)} />
+                    )}
+                </div>
+            );
+        }
+
+        function SetInput({ exerciseId, onAddSet }) {
+            const [weight, setWeight] = useState('');
+            const [reps, setReps] = useState('');
+
+            const handleAdd = () => {
+                if (!weight || !reps) {
+                    alert('Заполни вес и повторения!');
+                    return;
+                }
+                onAddSet(exerciseId, weight, reps);
+                setWeight('');
+                setReps('');
+            };
+
+            return (
+                <div>
+                    <div className="set-input-grid">
+                        <div className="input-group">
+                            <label className="input-label">Вес (кг)</label>
+                            <input
+                                type="number"
+                                inputMode="decimal"
+                                className="input"
+                                value={weight}
+                                onChange={(e) => setWeight(e.target.value)}
+                            />
+                        </div>
+                        <div className="input-group">
+                            <label className="input-label">Повторения</label>
+                            <input
+                                type="number"
+                                inputMode="numeric"
+                                className="input"
+                                value={reps}
+                                onChange={(e) => setReps(e.target.value)}
+                            />
+                        </div>
+                    </div>
+                    <button className="btn btn-primary" onClick={handleAdd}>
+                        <i className="fas fa-plus"></i> Добавить подход
+                    </button>
+                </div>
+            );
+        }
+
+        function ScheduleModal({ selectedDate, schedule, onClose, onSave, onDelete }) {
+            const [time, setTime] = useState('09:00');
+            const dateKey = getDateKey(selectedDate);
+            const existingWorkout = schedule[dateKey];
+
+            return (
+                <div className="modal-overlay" onClick={onClose}>
+                    <div className="modal" onClick={(e) => e.stopPropagation()}>
+                        <div className="modal-header">
+                            <div className="modal-title">
+                                {existingWorkout ? 'Тренировка запланирована' : 'Запланировать тренировку'}
+                            </div>
+                            <button className="close-btn" onClick={onClose}>
+                                <i className="fas fa-times"></i>
+                            </button>
+                        </div>
+
+                        <div style={{ marginBottom: '24px', color: 'var(--text-secondary)', fontSize: '16px' }}>
+                            {selectedDate.toLocaleDateString('ru-RU', {
+                                weekday: 'long',
+                                day: 'numeric',
+                                month: 'long'
+                            })}
+                        </div>
+
+                        {existingWorkout ? (
+                            <>
+                                <div style={{ textAlign: 'center', padding: '32px 24px', marginBottom: '20px' }}>
+                                    <div
+                                        style={{
+                                            fontSize: '64px',
+                                            marginBottom: '16px'
+                                        }}
+                                    >
+                                        <i className="fas fa-fire" style={{ color: 'var(--accent)' }}></i>
+                                    </div>
+                                    <div style={{ fontSize: '24px', fontWeight: '700', marginBottom: '8px' }}>
+                                        Время: {existingWorkout.time}
+                                    </div>
+                                    <div style={{ color: 'var(--text-secondary)', fontSize: '16px' }}>
+                                        Тренировка запланирована
+                                    </div>
+                                </div>
+                                <button
+                                    className="btn btn-danger"
+                                    onClick={() => {
+                                        onDelete(selectedDate);
+                                        onClose();
+                                    }}
+                                >
+                                    <i className="fas fa-trash"></i> Удалить тренировку
+                                </button>
+                                <button className="btn btn-secondary" onClick={onClose}>
+                                    Закрыть
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                <div className="input-group">
+                                    <label className="input-label">Время тренировки</label>
+                                    <input
+                                        type="time"
+                                        className="input"
+                                        value={time}
+                                        onChange={(e) => setTime(e.target.value)}
+                                    />
+                                </div>
+
+                                <button
+                                    className="btn btn-primary"
+                                    onClick={() => {
+                                        onSave(selectedDate, time);
+                                        onClose();
+                                    }}
+                                >
+                                    <i className="fas fa-check"></i> Сохранить
+                                </button>
+                                <button className="btn btn-secondary" onClick={onClose}>
+                                    Отмена
+                                </button>
+                            </>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        function ExerciseModal({
+            exercises,
+            searchTerm,
+            setSearchTerm,
+            filterCategory,
+            setFilterCategory,
+            categories,
+            onSelect,
+            onClose
+        }) {
+            return (
+                <div className="modal-overlay" onClick={onClose}>
+                    <div className="modal" onClick={(e) => e.stopPropagation()}>
+                        <div className="modal-header">
+                            <div className="modal-title">Выбери упражнение</div>
+                            <button className="close-btn" onClick={onClose}>
+                                <i className="fas fa-times"></i>
+                            </button>
+                        </div>
+
+                        <div className="search-box">
+                            <i className="fas fa-search"></i>
+                            <input
+                                className="input"
+                                placeholder="Поиск..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                        </div>
+
+                        <select value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)}>
+                            {categories.map(cat => (
+                                <option key={cat} value={cat}>
+                                    {cat === 'all' ? 'Все категории' : cat}
+                                </option>
+                            ))}
+                        </select>
+
+                        <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+                            {exercises.map(exercise => (
+                                <div key={exercise.id} className="exercise-item" onClick={() => onSelect(exercise)}>
+                                    <div className="exercise-icon">
+                                        <i className="fas fa-dumbbell"></i>
+                                    </div>
+                                    <div className="exercise-info">
+                                        <div className="exercise-name">{exercise.name}</div>
+                                        <div className="exercise-meta">{exercise.muscle}</div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        function VideoModal({ exercise, onClose }) {
+            return (
+                <div className="modal-overlay" onClick={onClose}>
+                    <div className="modal" onClick={(e) => e.stopPropagation()}>
+                        <div className="modal-header">
+                            <div className="modal-title">{exercise.name}</div>
+                            <button className="close-btn" onClick={onClose}>
+                                <i className="fas fa-times"></i>
+                            </button>
+                        </div>
+
+                        <div className="video-container">
+                            <iframe
+                                src={`https://www.youtube.com/embed/${exercise.videoId}`}
+                                frameBorder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen
+                            ></iframe>
+                        </div>
+
+                        <div style={{ marginBottom: '20px' }}>
+                            <span className="badge">{exercise.category}</span>
+                            <span style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>{exercise.muscle}</span>
+                        </div>
+
+                        <button className="btn btn-secondary" onClick={onClose}>
+                            Закрыть
+                        </button>
+                    </div>
+                </div>
+            );
+        }
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker
+                    .register('sw.js')
+                    .then(reg => console.log('SW registered'))
+                    .catch(err => console.log('SW error:', err));
+            });
+        }
+    </script>
+</body>
+</html>
