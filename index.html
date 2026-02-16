@@ -842,27 +842,27 @@
             const days = [];
             const prevMonth = new Date(year, month, 0);
             const prevMonthDays = prevMonth.getDate();
-            const addToCalendar = (date, time) => {
+            // Улучшенная функция для iPhone
+const addToCalendar = async (date, time) => {
     const [hours, minutes] = time.split(':').map(Number);
-    
     const startDate = new Date(date);
     startDate.setHours(hours, minutes, 0);
-    
     const endDate = new Date(startDate);
-    endDate.setHours(hours + 1, minutes, 0); // Тренировка 1 час
+    endDate.setHours(hours + 1, minutes, 0);
 
     const formatDate = (d) => d.toISOString().replace(/-|:|\.\d\d\d/g, "");
 
-    const event = [
+    // Создаем содержимое файла календаря
+    const eventContent = [
         'BEGIN:VCALENDAR',
         'VERSION:2.0',
         'BEGIN:VEVENT',
         'DTSTART:' + formatDate(startDate),
         'DTEND:' + formatDate(endDate),
         'SUMMARY:Тренировка Danika Fit',
-        'DESCRIPTION:Время стать сильнее!',
-        'BEGIN:VALARM', // Настройка уведомления
-        'TRIGGER:-PT60M', // Напомнить за 60 минут (1 час)
+        'DESCRIPTION:Время стать сильнее! Пора на тренировку.',
+        'BEGIN:VALARM',
+        'TRIGGER:-PT60M', // Напоминание за 1 час (60 минут)
         'ACTION:DISPLAY',
         'DESCRIPTION:Напоминание о тренировке',
         'END:VALARM',
@@ -870,16 +870,33 @@
         'END:VCALENDAR'
     ].join('\n');
 
-    const blob = new Blob([event], { type: 'text/calendar;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    
-    // Создаем временную ссылку и кликаем по ней
+    const file = new File([eventContent], 'workout.ics', { type: 'text/calendar' });
+
+    // 1. Пробуем открыть системное меню "Поделиться" (Лучший способ для iPhone)
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+            await navigator.share({
+                files: [file],
+                title: 'Тренировка',
+                text: 'Добавь тренировку в календарь'
+            });
+            return; // Если получилось, выходим
+        } catch (err) {
+            console.log('Ошибка при шаринге, пробуем скачивание...', err);
+        }
+    }
+
+    // 2. Если "Поделиться" не сработало, пробуем старый метод (Скачивание)
+    const url = URL.createObjectURL(file);
     const link = document.createElement('a');
     link.href = url;
     link.setAttribute('download', 'workout.ics');
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+
+    // 3. Выводим подсказку, если всё равно ничего не произошло
+    alert('Если календарь не открылся:\n1. Проверьте папку "Файлы" или "Загрузки"\n2. Либо откройте это приложение через обычный Safari, а не с иконки на экране.');
 };
             for (let i = startingDayOfWeek - 1; i >= 0; i--) {
                 days.push({
