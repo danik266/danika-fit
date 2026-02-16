@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -34,6 +34,9 @@
             --warning: #FFAA00;
             --border: #222B45;
             --shadow: rgba(0, 0, 0, 0.3);
+            /* Переменные для безопасных зон iPhone */
+            --safe-top: env(safe-area-inset-top, 0px);
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
         }
         
         body {
@@ -43,20 +46,27 @@
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
             min-height: 100vh;
+            /* Предотвращение скролла всей страницы за пределами контента */
+            overscroll-behavior-y: none;
         }
         
-        .app { min-height: 100vh; display: flex; flex-direction: column; }
+        .app { 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column;
+            padding-bottom: var(--safe-bottom); /* Отступ снизу для iPhone */
+        }
         
         /* Header */
         .header {
-            background: var(--bg-secondary);
-            padding: 24px;
+            background: rgba(19, 25, 47, 0.95);
+            /* Учитываем безопасную зону сверху */
+            padding: calc(16px + var(--safe-top)) 24px 16px 24px;
             border-bottom: 1px solid var(--border);
             position: sticky;
             top: 0;
             z-index: 100;
             backdrop-filter: blur(20px);
-            background: rgba(19, 25, 47, 0.95);
         }
         
         .header-content {
@@ -74,19 +84,19 @@
         }
         
         .logo-icon {
-            width: 44px;
-            height: 44px;
+            width: 40px;
+            height: 40px;
             background: linear-gradient(135deg, var(--accent) 0%, #8B7FFF 100%);
-            border-radius: 14px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: 18px;
             box-shadow: 0 4px 12px rgba(108, 99, 255, 0.3);
         }
         
         .logo-text {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: 800;
             letter-spacing: -0.5px;
             background: linear-gradient(135deg, var(--accent) 0%, #8B7FFF 100%);
@@ -95,8 +105,8 @@
         }
         
         .icon-btn {
-            width: 44px;
-            height: 44px;
+            width: 40px;
+            height: 40px;
             border-radius: 12px;
             background: var(--bg-tertiary);
             border: 1px solid var(--border);
@@ -105,11 +115,10 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: transform 0.1s;
             position: relative;
         }
         
-        .icon-btn:hover { background: var(--border); transform: translateY(-2px); }
         .icon-btn:active { transform: scale(0.95); }
         
         .notification-dot {
@@ -125,38 +134,45 @@
         
         /* Navigation */
         .nav {
-            background: var(--bg-secondary);
-            padding: 12px 24px;
+            background: rgba(19, 25, 47, 0.95);
+            padding: 8px 16px;
             border-bottom: 1px solid var(--border);
             overflow-x: auto;
             display: flex;
             gap: 8px;
             position: sticky;
-            top: 93px;
+            /* Позиционируем сразу под хедером. Высота хедера примерная, но sticky сработает */
+            top: 73px; 
             z-index: 99;
             backdrop-filter: blur(20px);
-            background: rgba(19, 25, 47, 0.95);
+            -webkit-overflow-scrolling: touch; /* Плавный скролл на iOS */
         }
         
         .nav::-webkit-scrollbar { display: none; }
         
         .nav-item {
-            padding: 10px 20px;
-            border-radius: 12px;
+            padding: 8px 16px;
+            border-radius: 10px;
             border: none;
             background: transparent;
             color: var(--text-secondary);
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
             white-space: nowrap;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
         
-        .nav-item:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+        /* Ховер эффекты только для устройств с мышью */
+        @media (hover: hover) {
+            .nav-item:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+            .icon-btn:hover { background: var(--border); }
+            .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(108, 99, 255, 0.4); }
+            .exercise-item:hover { border-color: var(--accent); transform: translateX(4px); }
+        }
+
         .nav-item.active {
             background: var(--accent);
             color: white;
@@ -166,7 +182,7 @@
         /* Content */
         .content {
             flex: 1;
-            padding: 24px;
+            padding: 16px;
             max-width: 1200px;
             margin: 0 auto;
             width: 100%;
@@ -176,8 +192,8 @@
         .calendar {
             background: var(--bg-secondary);
             border-radius: 20px;
-            padding: 24px;
-            margin-bottom: 24px;
+            padding: 16px;
+            margin-bottom: 16px;
             border: 1px solid var(--border);
         }
         
@@ -185,11 +201,11 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 24px;
+            margin-bottom: 16px;
         }
         
         .calendar-month {
-            font-size: 22px;
+            font-size: 18px;
             font-weight: 700;
         }
         
@@ -199,9 +215,9 @@
         }
         
         .calendar-nav-btn {
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
             background: var(--bg-tertiary);
             border: 1px solid var(--border);
             color: var(--text-primary);
@@ -209,27 +225,24 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: all 0.2s;
         }
         
-        .calendar-nav-btn:hover { background: var(--border); }
         .calendar-nav-btn:active { transform: scale(0.95); }
         
         .calendar-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 8px;
-            margin-bottom: 12px;
+            gap: 4px; /* Меньший отступ для маленьких экранов */
+            margin-bottom: 8px;
         }
         
         .calendar-weekday {
             text-align: center;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 700;
             color: var(--text-muted);
-            padding: 8px 0;
+            padding: 4px 0;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
         
         .calendar-day {
@@ -237,26 +250,23 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 12px;
+            border-radius: 10px;
             cursor: pointer;
-            transition: all 0.2s;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 600;
             background: var(--bg-tertiary);
             border: 2px solid transparent;
             position: relative;
         }
         
-        .calendar-day:hover { background: var(--border); transform: scale(1.05); }
         .calendar-day.other-month { opacity: 0.3; }
         .calendar-day.today {
             border-color: var(--accent);
-            box-shadow: 0 0 0 4px rgba(108, 99, 255, 0.1);
         }
         .calendar-day.has-workout {
             background: linear-gradient(135deg, var(--accent) 0%, #8B7FFF 100%);
             color: white;
-            box-shadow: 0 4px 12px rgba(108, 99, 255, 0.3);
+            box-shadow: 0 2px 8px rgba(108, 99, 255, 0.3);
         }
         .calendar-day:active { transform: scale(0.95); }
         
@@ -264,8 +274,8 @@
         .card {
             background: var(--bg-secondary);
             border-radius: 20px;
-            padding: 24px;
-            margin-bottom: 20px;
+            padding: 20px;
+            margin-bottom: 16px;
             border: 1px solid var(--border);
         }
         
@@ -273,30 +283,30 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
         
         .card-title {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 700;
         }
         
         /* Status Card */
         .status-card {
             text-align: center;
-            padding: 48px 24px;
+            padding: 24px 12px;
         }
         
         .status-icon {
-            width: 100px;
-            height: 100px;
-            margin: 0 auto 24px;
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
             background: linear-gradient(135deg, var(--accent) 0%, #8B7FFF 100%);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 48px;
+            font-size: 36px;
             box-shadow: 0 8px 24px rgba(108, 99, 255, 0.3);
             animation: pulse 2s ease-in-out infinite;
         }
@@ -312,31 +322,27 @@
         }
         
         .status-title {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: 700;
-            margin-bottom: 8px;
-        }
-        
-        .status-subtitle {
-            color: var(--text-secondary);
-            font-size: 15px;
+            margin-bottom: 6px;
         }
         
         /* Buttons */
         .btn {
             width: 100%;
-            padding: 16px 24px;
+            padding: 16px;
             border-radius: 14px;
             border: none;
             font-size: 16px;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
             margin-top: 12px;
+            /* Убираем синее выделение при тапе на Android */
+            -webkit-tap-highlight-color: transparent;
         }
         
         .btn:active { transform: scale(0.98); }
@@ -347,18 +353,11 @@
             box-shadow: 0 4px 12px rgba(108, 99, 255, 0.3);
         }
         
-        .btn-primary:hover {
-            box-shadow: 0 6px 16px rgba(108, 99, 255, 0.4);
-            transform: translateY(-2px);
-        }
-        
         .btn-secondary {
             background: var(--bg-tertiary);
             color: var(--text-primary);
             border: 1px solid var(--border);
         }
-        
-        .btn-secondary:hover { background: var(--border); }
         
         .btn-danger {
             background: var(--danger);
@@ -371,11 +370,6 @@
             border: 2px solid var(--accent);
         }
         
-        .btn-outline:hover {
-            background: var(--accent);
-            color: white;
-        }
-        
         /* Modal */
         .modal-overlay {
             position: fixed;
@@ -386,10 +380,10 @@
             background: rgba(0, 0, 0, 0.8);
             backdrop-filter: blur(4px);
             display: flex;
-            align-items: center;
+            align-items: flex-end; /* Модалка снизу для мобилок */
             justify-content: center;
             z-index: 1000;
-            padding: 20px;
+            padding: 0;
             animation: fadeIn 0.2s;
         }
         
@@ -399,21 +393,37 @@
         }
         
         @keyframes slideUp {
-            from { transform: translateY(100px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
         }
         
         .modal {
             background: var(--bg-secondary);
-            border-radius: 24px;
-            padding: 32px;
-            max-width: 500px;
+            border-radius: 24px 24px 0 0; /* Закругление только сверху */
+            padding: 24px;
             width: 100%;
-            max-height: 85vh;
+            max-width: 100%;
+            max-height: 90vh;
             overflow-y: auto;
             animation: slideUp 0.3s ease-out;
-            border: 1px solid var(--border);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            border-top: 1px solid var(--border);
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
+            /* Учитываем safe area снизу */
+            padding-bottom: calc(24px + var(--safe-bottom));
+        }
+        
+        @media (min-width: 768px) {
+            .modal-overlay { align-items: center; padding: 20px; }
+            .modal { 
+                border-radius: 24px; 
+                max-width: 500px; 
+                padding-bottom: 32px;
+                animation: slideUpDesktop 0.3s ease-out;
+            }
+             @keyframes slideUpDesktop {
+                from { transform: translateY(100px); opacity: 0; }
+                to { transform: translateY(0); opacity: 1; }
+            }
         }
         
         .modal-header {
@@ -423,14 +433,9 @@
             margin-bottom: 24px;
         }
         
-        .modal-title {
-            font-size: 24px;
-            font-weight: 800;
-        }
-        
         .close-btn {
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             background: var(--bg-tertiary);
             border: none;
@@ -439,35 +444,21 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .close-btn:hover {
-            background: var(--border);
-            color: var(--text-primary);
         }
         
         /* Input */
         .input-group {
-            margin-bottom: 20px;
-        }
-        
-        .input-label {
-            display: block;
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text-secondary);
-            margin-bottom: 8px;
+            margin-bottom: 16px;
         }
         
         .input {
             width: 100%;
-            padding: 14px 16px;
+            padding: 16px; /* Больше паддинг для пальца */
             border-radius: 12px;
             border: 1px solid var(--border);
             background: var(--bg-tertiary);
             color: var(--text-primary);
-            font-size: 16px;
+            font-size: 16px; /* 16px предотвращает зум на iPhone */
             transition: all 0.2s;
         }
         
@@ -475,77 +466,57 @@
             outline: none;
             border-color: var(--accent);
             background: var(--bg-primary);
-            box-shadow: 0 0 0 4px rgba(108, 99, 255, 0.1);
         }
         
         /* Exercise Item */
         .exercise-item {
             background: var(--bg-tertiary);
-            padding: 16px;
+            padding: 12px;
             border-radius: 16px;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             cursor: pointer;
             border: 1px solid var(--border);
-            transition: all 0.2s;
             display: flex;
             align-items: center;
-            gap: 16px;
-        }
-        
-        .exercise-item:hover {
-            border-color: var(--accent);
-            transform: translateX(4px);
+            gap: 12px;
         }
         
         .exercise-icon {
-            width: 56px;
-            height: 56px;
+            width: 48px;
+            height: 48px;
             background: linear-gradient(135deg, var(--accent) 0%, #8B7FFF 100%);
-            border-radius: 16px;
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
+            font-size: 20px;
             flex-shrink: 0;
-            box-shadow: 0 4px 12px rgba(108, 99, 255, 0.3);
+            color: white;
         }
         
         .exercise-info { flex: 1; }
         
         .exercise-name {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 700;
             margin-bottom: 4px;
         }
         
         .exercise-meta {
-            font-size: 13px;
+            font-size: 12px;
             color: var(--text-secondary);
         }
         
         /* Set Item */
         .set-item {
             background: var(--bg-tertiary);
-            padding: 16px;
+            padding: 14px;
             border-radius: 12px;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             border: 1px solid var(--border);
-        }
-        
-        .set-number {
-            font-weight: 700;
-            color: var(--accent);
-            font-size: 16px;
-        }
-        
-        .set-details {
-            display: flex;
-            gap: 16px;
-            font-size: 16px;
-            font-weight: 600;
         }
         
         .set-input-grid {
@@ -559,246 +530,79 @@
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
+            gap: 12px;
             margin-bottom: 24px;
         }
         
         .stat-card {
             background: var(--bg-tertiary);
-            padding: 24px;
-            border-radius: 20px;
+            padding: 16px;
+            border-radius: 16px;
             border: 1px solid var(--border);
             text-align: center;
         }
         
-        .stat-icon {
-            width: 56px;
-            height: 56px;
-            margin: 0 auto 16px;
-            background: linear-gradient(135deg, var(--accent) 0%, #8B7FFF 100%);
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            box-shadow: 0 4px 12px rgba(108, 99, 255, 0.3);
-        }
-        
         .stat-value {
-            font-size: 32px;
+            font-size: 24px;
             font-weight: 800;
             margin-bottom: 4px;
-        }
-        
-        .stat-label {
-            font-size: 14px;
-            color: var(--text-secondary);
-            font-weight: 600;
         }
         
         /* Timer */
         .timer-display {
             text-align: center;
-            padding: 60px 24px;
+            padding: 40px 20px;
             background: linear-gradient(135deg, var(--accent) 0%, #8B7FFF 100%);
             border-radius: 24px;
             margin-bottom: 24px;
-            box-shadow: 0 8px 24px rgba(108, 99, 255, 0.3);
         }
         
         .timer-time {
-            font-size: 80px;
+            font-size: 72px;
             font-weight: 900;
-            margin-bottom: 32px;
+            margin-bottom: 24px;
             font-variant-numeric: tabular-nums;
-            letter-spacing: -4px;
-        }
-        
-        .timer-controls {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-        }
-        
-        .timer-btn {
-            padding: 16px 32px;
-            border: 3px solid white;
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border-radius: 16px;
-            cursor: pointer;
-            font-weight: 700;
-            font-size: 16px;
-            backdrop-filter: blur(10px);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.2s;
-        }
-        
-        .timer-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: translateY(-2px);
-        }
-        
-        .timer-btn:active { transform: scale(0.95); }
-        
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 80px 24px;
-        }
-        
-        .empty-icon {
-            width: 120px;
-            height: 120px;
-            margin: 0 auto 24px;
-            background: var(--bg-tertiary);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 48px;
-            color: var(--text-muted);
-            border: 2px solid var(--border);
-        }
-        
-        .empty-title {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-        
-        .empty-subtitle {
-            color: var(--text-secondary);
-            font-size: 16px;
-            margin-bottom: 32px;
+            letter-spacing: -2px;
         }
         
         /* Schedule Item */
         .schedule-item {
-            background: var(--bg-tertiary);
-            padding: 16px;
-            border-radius: 16px;
-            margin-bottom: 12px;
-            border: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            gap: 16px;
+            padding: 12px;
+            gap: 12px;
         }
         
         .schedule-date {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 12px;
-            background: var(--bg-secondary);
-            border-radius: 12px;
-            min-width: 70px;
+            padding: 8px;
+            min-width: 60px;
         }
         
-        .schedule-day {
-            font-size: 24px;
-            font-weight: 800;
-            color: var(--accent);
-        }
+        .schedule-day { font-size: 20px; }
         
-        .schedule-month {
-            font-size: 12px;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-        }
-        
-        .schedule-info { flex: 1; }
-        
-        .schedule-title {
-            font-size: 16px;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-        
-        .schedule-time {
-            font-size: 14px;
-            color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        
-        .schedule-actions {
-            display: flex;
-            gap: 8px;
-        }
-        
-        .btn-sm {
-            padding: 10px 16px;
-            font-size: 14px;
-            width: auto;
-            margin: 0;
-        }
-        
-        /* Badge */
-        .badge {
-            display: inline-block;
-            padding: 6px 12px;
-            background: var(--accent);
-            color: white;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 700;
-            margin-right: 8px;
-        }
-        
-        /* Video Container */
+        /* Video */
         .video-container {
-            position: relative;
-            padding-bottom: 56.25%;
-            height: 0;
-            overflow: hidden;
             border-radius: 16px;
             margin-bottom: 20px;
+            background: black;
         }
-        
-        .video-container iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-        
-        /* Search Box */
-        .search-box {
-            position: relative;
-            margin-bottom: 16px;
-        }
-        
-        .search-box i {
-            position: absolute;
-            left: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-        }
-        
-        .search-box input {
-            padding-left: 48px;
-        }
+
+        /* Search */
+        .search-box i { left: 16px; }
+        .search-box input { padding-left: 48px; }
         
         select {
             width: 100%;
-            padding: 14px 16px;
+            padding: 16px;
             border-radius: 12px;
             border: 1px solid var(--border);
             background: var(--bg-tertiary);
             color: var(--text-primary);
             font-size: 16px;
             margin-bottom: 16px;
-        }
-        
-        @media (max-width: 768px) {
-            .stats-grid { grid-template-columns: 1fr; }
-            .timer-time { font-size: 64px; }
+            appearance: none; /* Убирает стандартную стрелку браузера */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%238F9BB3' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            background-size: 16px;
         }
     </style>
 </head>
@@ -842,62 +646,7 @@
             const days = [];
             const prevMonth = new Date(year, month, 0);
             const prevMonthDays = prevMonth.getDate();
-            // Улучшенная функция для iPhone
-const addToCalendar = async (date, time) => {
-    const [hours, minutes] = time.split(':').map(Number);
-    const startDate = new Date(date);
-    startDate.setHours(hours, minutes, 0);
-    const endDate = new Date(startDate);
-    endDate.setHours(hours + 1, minutes, 0);
-
-    const formatDate = (d) => d.toISOString().replace(/-|:|\.\d\d\d/g, "");
-
-    // Создаем содержимое файла календаря
-    const eventContent = [
-        'BEGIN:VCALENDAR',
-        'VERSION:2.0',
-        'BEGIN:VEVENT',
-        'DTSTART:' + formatDate(startDate),
-        'DTEND:' + formatDate(endDate),
-        'SUMMARY:Тренировка Danika Fit',
-        'DESCRIPTION:Время стать сильнее! Пора на тренировку.',
-        'BEGIN:VALARM',
-        'TRIGGER:-PT60M', // Напоминание за 1 час (60 минут)
-        'ACTION:DISPLAY',
-        'DESCRIPTION:Напоминание о тренировке',
-        'END:VALARM',
-        'END:VEVENT',
-        'END:VCALENDAR'
-    ].join('\n');
-
-    const file = new File([eventContent], 'workout.ics', { type: 'text/calendar' });
-
-    // 1. Пробуем открыть системное меню "Поделиться" (Лучший способ для iPhone)
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        try {
-            await navigator.share({
-                files: [file],
-                title: 'Тренировка',
-                text: 'Добавь тренировку в календарь'
-            });
-            return; // Если получилось, выходим
-        } catch (err) {
-            console.log('Ошибка при шаринге, пробуем скачивание...', err);
-        }
-    }
-
-    // 2. Если "Поделиться" не сработало, пробуем старый метод (Скачивание)
-    const url = URL.createObjectURL(file);
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', 'workout.ics');
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
-    // 3. Выводим подсказку, если всё равно ничего не произошло
-    alert('Если календарь не открылся:\n1. Проверьте папку "Файлы" или "Загрузки"\n2. Либо откройте это приложение через обычный Safari, а не с иконки на экране.');
-};
+            
             for (let i = startingDayOfWeek - 1; i >= 0; i--) {
                 days.push({
                     day: prevMonthDays - i,
@@ -925,6 +674,64 @@ const addToCalendar = async (date, time) => {
             
             return days;
         };
+
+        // Улучшенная функция для iPhone (ВЫНЕСЕНА В GLOBAL SCOPE)
+        const addToCalendar = async (date, time) => {
+            const [hours, minutes] = time.split(':').map(Number);
+            const startDate = new Date(date);
+            startDate.setHours(hours, minutes, 0);
+            const endDate = new Date(startDate);
+            endDate.setHours(hours + 1, minutes, 0);
+
+            const formatDate = (d) => d.toISOString().replace(/-|:|\.\d\d\d/g, "");
+
+            // Создаем содержимое файла календаря
+            const eventContent = [
+                'BEGIN:VCALENDAR',
+                'VERSION:2.0',
+                'BEGIN:VEVENT',
+                'DTSTART:' + formatDate(startDate),
+                'DTEND:' + formatDate(endDate),
+                'SUMMARY:Тренировка Danika Fit',
+                'DESCRIPTION:Время стать сильнее! Пора на тренировку.',
+                'BEGIN:VALARM',
+                'TRIGGER:-PT60M', // Напоминание за 1 час (60 минут)
+                'ACTION:DISPLAY',
+                'DESCRIPTION:Напоминание о тренировке',
+                'END:VALARM',
+                'END:VEVENT',
+                'END:VCALENDAR'
+            ].join('\n');
+
+            const file = new File([eventContent], 'workout.ics', { type: 'text/calendar' });
+
+            // 1. Пробуем открыть системное меню "Поделиться" (Лучший способ для iPhone)
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                try {
+                    await navigator.share({
+                        files: [file],
+                        title: 'Тренировка',
+                        text: 'Добавь тренировку в календарь'
+                    });
+                    return; // Если получилось, выходим
+                } catch (err) {
+                    console.log('Ошибка при шаринге, пробуем скачивание...', err);
+                }
+            }
+
+            // 2. Если "Поделиться" не сработало, пробуем старый метод (Скачивание)
+            const url = URL.createObjectURL(file);
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', 'workout.ics');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            // 3. Выводим подсказку
+            alert('Если календарь не открылся:\n1. Проверьте папку "Файлы" или "Загрузки"\n2. Либо откройте это приложение через обычный Safari.');
+        };
+
 
         function App() {
             const [activeTab, setActiveTab] = useState('home');
@@ -1675,96 +1482,96 @@ const addToCalendar = async (date, time) => {
         }
 
         function ScheduleModal({ selectedDate, schedule, onClose, onSave, onDelete }) {
-    const [time, setTime] = useState('09:00');
-    const dateKey = getDateKey(selectedDate);
-    const existingWorkout = schedule[dateKey];
+            const [time, setTime] = useState('09:00');
+            const dateKey = getDateKey(selectedDate);
+            const existingWorkout = schedule[dateKey];
 
-    // Обработчик сохранения с вопросом про календарь
-    const handleSave = () => {
-        onSave(selectedDate, time);
-        // Предлагаем добавить в календарь сразу при сохранении
-        if(confirm('Добавить напоминание в Календарь iPhone?')) {
-            addToCalendar(selectedDate, time);
-        }
-        onClose();
-    };
+            // Обработчик сохранения с вопросом про календарь
+            const handleSave = () => {
+                onSave(selectedDate, time);
+                // Предлагаем добавить в календарь сразу при сохранении
+                if(confirm('Добавить напоминание в Календарь iPhone?')) {
+                    addToCalendar(selectedDate, time);
+                }
+                onClose();
+            };
 
-    return (
-        <div className="modal-overlay" onClick={onClose}>
-            <div className="modal" onClick={(e) => e.stopPropagation()}>
-                <div className="modal-header">
-                    <div className="modal-title">
-                        {existingWorkout ? 'Тренировка запланирована' : 'Запланировать'}
-                    </div>
-                    <button className="close-btn" onClick={onClose}>
-                        <i className="fas fa-times"></i>
-                    </button>
-                </div>
-
-                <div style={{ marginBottom: '24px', color: 'var(--text-secondary)', fontSize: '16px' }}>
-                    {selectedDate.toLocaleDateString('ru-RU', {
-                        weekday: 'long',
-                        day: 'numeric',
-                        month: 'long'
-                    })}
-                </div>
-
-                {existingWorkout ? (
-                    <>
-                        <div style={{ textAlign: 'center', padding: '32px 24px', marginBottom: '20px' }}>
-                            <div style={{ fontSize: '64px', marginBottom: '16px' }}>
-                                <i className="fas fa-fire" style={{ color: 'var(--accent)' }}></i>
+            return (
+                <div className="modal-overlay" onClick={onClose}>
+                    <div className="modal" onClick={(e) => e.stopPropagation()}>
+                        <div className="modal-header">
+                            <div className="modal-title">
+                                {existingWorkout ? 'Тренировка запланирована' : 'Запланировать'}
                             </div>
-                            <div style={{ fontSize: '24px', fontWeight: '700', marginBottom: '8px' }}>
-                                Время: {existingWorkout.time}
-                            </div>
-                            
-                            {/* Кнопка для добавления в календарь уже созданной тренировки */}
-                            <button 
-                                className="btn btn-secondary" 
-                                style={{marginBottom: '10px'}}
-                                onClick={() => addToCalendar(new Date(existingWorkout.date), existingWorkout.time)}
-                            >
-                                <i className="fas fa-calendar-plus"></i> Добавить в календарь
+                            <button className="close-btn" onClick={onClose}>
+                                <i className="fas fa-times"></i>
                             </button>
                         </div>
-                        <button
-                            className="btn btn-danger"
-                            onClick={() => {
-                                onDelete(selectedDate);
-                                onClose();
-                            }}
-                        >
-                            <i className="fas fa-trash"></i> Удалить тренировку
-                        </button>
-                    </>
-                ) : (
-                    <>
-                        <div className="input-group">
-                            <label className="input-label">Время тренировки</label>
-                            <input
-                                type="time"
-                                className="input"
-                                value={time}
-                                onChange={(e) => setTime(e.target.value)}
-                            />
+
+                        <div style={{ marginBottom: '24px', color: 'var(--text-secondary)', fontSize: '16px' }}>
+                            {selectedDate.toLocaleDateString('ru-RU', {
+                                weekday: 'long',
+                                day: 'numeric',
+                                month: 'long'
+                            })}
                         </div>
 
-                        <button
-                            className="btn btn-primary"
-                            onClick={handleSave} // Используем новый обработчик
-                        >
-                            <i className="fas fa-check"></i> Сохранить
-                        </button>
-                        <button className="btn btn-secondary" onClick={onClose}>
-                            Отмена
-                        </button>
-                    </>
-                )}
-            </div>
-        </div>
-    );
-}
+                        {existingWorkout ? (
+                            <>
+                                <div style={{ textAlign: 'center', padding: '32px 24px', marginBottom: '20px' }}>
+                                    <div style={{ fontSize: '64px', marginBottom: '16px' }}>
+                                        <i className="fas fa-fire" style={{ color: 'var(--accent)' }}></i>
+                                    </div>
+                                    <div style={{ fontSize: '24px', fontWeight: '700', marginBottom: '8px' }}>
+                                        Время: {existingWorkout.time}
+                                    </div>
+                                    
+                                    {/* Кнопка для добавления в календарь уже созданной тренировки */}
+                                    <button 
+                                        className="btn btn-secondary" 
+                                        style={{marginBottom: '10px'}}
+                                        onClick={() => addToCalendar(new Date(existingWorkout.date), existingWorkout.time)}
+                                    >
+                                        <i className="fas fa-calendar-plus"></i> Добавить в календарь
+                                    </button>
+                                </div>
+                                <button
+                                    className="btn btn-danger"
+                                    onClick={() => {
+                                        onDelete(selectedDate);
+                                        onClose();
+                                    }}
+                                >
+                                    <i className="fas fa-trash"></i> Удалить тренировку
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                <div className="input-group">
+                                    <label className="input-label">Время тренировки</label>
+                                    <input
+                                        type="time"
+                                        className="input"
+                                        value={time}
+                                        onChange={(e) => setTime(e.target.value)}
+                                    />
+                                </div>
+
+                                <button
+                                    className="btn btn-primary"
+                                    onClick={handleSave}
+                                >
+                                    <i className="fas fa-check"></i> Сохранить
+                                </button>
+                                <button className="btn btn-secondary" onClick={onClose}>
+                                    Отмена
+                                </button>
+                            </>
+                        )}
+                    </div>
+                </div>
+            );
+        }
 
         function ExerciseModal({
             exercises,
