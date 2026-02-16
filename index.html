@@ -842,7 +842,45 @@
             const days = [];
             const prevMonth = new Date(year, month, 0);
             const prevMonthDays = prevMonth.getDate();
-            
+            const addToCalendar = (date, time) => {
+    const [hours, minutes] = time.split(':').map(Number);
+    
+    const startDate = new Date(date);
+    startDate.setHours(hours, minutes, 0);
+    
+    const endDate = new Date(startDate);
+    endDate.setHours(hours + 1, minutes, 0); // Тренировка 1 час
+
+    const formatDate = (d) => d.toISOString().replace(/-|:|\.\d\d\d/g, "");
+
+    const event = [
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'BEGIN:VEVENT',
+        'DTSTART:' + formatDate(startDate),
+        'DTEND:' + formatDate(endDate),
+        'SUMMARY:Тренировка Danika Fit',
+        'DESCRIPTION:Время стать сильнее!',
+        'BEGIN:VALARM', // Настройка уведомления
+        'TRIGGER:-PT60M', // Напомнить за 60 минут (1 час)
+        'ACTION:DISPLAY',
+        'DESCRIPTION:Напоминание о тренировке',
+        'END:VALARM',
+        'END:VEVENT',
+        'END:VCALENDAR'
+    ].join('\n');
+
+    const blob = new Blob([event], { type: 'text/calendar;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    
+    // Создаем временную ссылку и кликаем по ней
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'workout.ics');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+};
             for (let i = startingDayOfWeek - 1; i >= 0; i--) {
                 days.push({
                     day: prevMonthDays - i,
@@ -1620,91 +1658,96 @@
         }
 
         function ScheduleModal({ selectedDate, schedule, onClose, onSave, onDelete }) {
-            const [time, setTime] = useState('09:00');
-            const dateKey = getDateKey(selectedDate);
-            const existingWorkout = schedule[dateKey];
+    const [time, setTime] = useState('09:00');
+    const dateKey = getDateKey(selectedDate);
+    const existingWorkout = schedule[dateKey];
 
-            return (
-                <div className="modal-overlay" onClick={onClose}>
-                    <div className="modal" onClick={(e) => e.stopPropagation()}>
-                        <div className="modal-header">
-                            <div className="modal-title">
-                                {existingWorkout ? 'Тренировка запланирована' : 'Запланировать тренировку'}
+    // Обработчик сохранения с вопросом про календарь
+    const handleSave = () => {
+        onSave(selectedDate, time);
+        // Предлагаем добавить в календарь сразу при сохранении
+        if(confirm('Добавить напоминание в Календарь iPhone?')) {
+            addToCalendar(selectedDate, time);
+        }
+        onClose();
+    };
+
+    return (
+        <div className="modal-overlay" onClick={onClose}>
+            <div className="modal" onClick={(e) => e.stopPropagation()}>
+                <div className="modal-header">
+                    <div className="modal-title">
+                        {existingWorkout ? 'Тренировка запланирована' : 'Запланировать'}
+                    </div>
+                    <button className="close-btn" onClick={onClose}>
+                        <i className="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <div style={{ marginBottom: '24px', color: 'var(--text-secondary)', fontSize: '16px' }}>
+                    {selectedDate.toLocaleDateString('ru-RU', {
+                        weekday: 'long',
+                        day: 'numeric',
+                        month: 'long'
+                    })}
+                </div>
+
+                {existingWorkout ? (
+                    <>
+                        <div style={{ textAlign: 'center', padding: '32px 24px', marginBottom: '20px' }}>
+                            <div style={{ fontSize: '64px', marginBottom: '16px' }}>
+                                <i className="fas fa-fire" style={{ color: 'var(--accent)' }}></i>
                             </div>
-                            <button className="close-btn" onClick={onClose}>
-                                <i className="fas fa-times"></i>
+                            <div style={{ fontSize: '24px', fontWeight: '700', marginBottom: '8px' }}>
+                                Время: {existingWorkout.time}
+                            </div>
+                            
+                            {/* Кнопка для добавления в календарь уже созданной тренировки */}
+                            <button 
+                                className="btn btn-secondary" 
+                                style={{marginBottom: '10px'}}
+                                onClick={() => addToCalendar(new Date(existingWorkout.date), existingWorkout.time)}
+                            >
+                                <i className="fas fa-calendar-plus"></i> Добавить в календарь
                             </button>
                         </div>
-
-                        <div style={{ marginBottom: '24px', color: 'var(--text-secondary)', fontSize: '16px' }}>
-                            {selectedDate.toLocaleDateString('ru-RU', {
-                                weekday: 'long',
-                                day: 'numeric',
-                                month: 'long'
-                            })}
+                        <button
+                            className="btn btn-danger"
+                            onClick={() => {
+                                onDelete(selectedDate);
+                                onClose();
+                            }}
+                        >
+                            <i className="fas fa-trash"></i> Удалить тренировку
+                        </button>
+                    </>
+                ) : (
+                    <>
+                        <div className="input-group">
+                            <label className="input-label">Время тренировки</label>
+                            <input
+                                type="time"
+                                className="input"
+                                value={time}
+                                onChange={(e) => setTime(e.target.value)}
+                            />
                         </div>
 
-                        {existingWorkout ? (
-                            <>
-                                <div style={{ textAlign: 'center', padding: '32px 24px', marginBottom: '20px' }}>
-                                    <div
-                                        style={{
-                                            fontSize: '64px',
-                                            marginBottom: '16px'
-                                        }}
-                                    >
-                                        <i className="fas fa-fire" style={{ color: 'var(--accent)' }}></i>
-                                    </div>
-                                    <div style={{ fontSize: '24px', fontWeight: '700', marginBottom: '8px' }}>
-                                        Время: {existingWorkout.time}
-                                    </div>
-                                    <div style={{ color: 'var(--text-secondary)', fontSize: '16px' }}>
-                                        Тренировка запланирована
-                                    </div>
-                                </div>
-                                <button
-                                    className="btn btn-danger"
-                                    onClick={() => {
-                                        onDelete(selectedDate);
-                                        onClose();
-                                    }}
-                                >
-                                    <i className="fas fa-trash"></i> Удалить тренировку
-                                </button>
-                                <button className="btn btn-secondary" onClick={onClose}>
-                                    Закрыть
-                                </button>
-                            </>
-                        ) : (
-                            <>
-                                <div className="input-group">
-                                    <label className="input-label">Время тренировки</label>
-                                    <input
-                                        type="time"
-                                        className="input"
-                                        value={time}
-                                        onChange={(e) => setTime(e.target.value)}
-                                    />
-                                </div>
-
-                                <button
-                                    className="btn btn-primary"
-                                    onClick={() => {
-                                        onSave(selectedDate, time);
-                                        onClose();
-                                    }}
-                                >
-                                    <i className="fas fa-check"></i> Сохранить
-                                </button>
-                                <button className="btn btn-secondary" onClick={onClose}>
-                                    Отмена
-                                </button>
-                            </>
-                        )}
-                    </div>
-                </div>
-            );
-        }
+                        <button
+                            className="btn btn-primary"
+                            onClick={handleSave} // Используем новый обработчик
+                        >
+                            <i className="fas fa-check"></i> Сохранить
+                        </button>
+                        <button className="btn btn-secondary" onClick={onClose}>
+                            Отмена
+                        </button>
+                    </>
+                )}
+            </div>
+        </div>
+    );
+}
 
         function ExerciseModal({
             exercises,
